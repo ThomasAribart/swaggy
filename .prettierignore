@@ -1,0 +1,8 @@
+*.hbs
+pnpm-lock.yaml
+.gitlab-ci.yml
+.pnpm
+**/coverage
+**/dist
+**/build
+**/public

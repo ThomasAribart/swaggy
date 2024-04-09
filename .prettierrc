@@ -1,0 +1,7 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "arrowParens": "avoid",
+  "importOrder": ["^@apdupius(.*)/(.*)$", "^~/(.*)$", "^[./]"],
+  "importOrderSeparation": true
+}

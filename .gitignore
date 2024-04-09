@@ -1,0 +1,12 @@
+# package directories
+node_modules
+.pnpm
+
+# production
+/build
+**/dist
+
+# macOS .DS_STORE
+.DS_STORE
+
+**/tsconfig.tsbuildinfo
