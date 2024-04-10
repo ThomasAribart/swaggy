@@ -5,6 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="<%- faviconPath %>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%- title %></title>
+    <!-- See https://github.com/swagger-api/swagger-ui/issues/7762 -->
+    <script>
+      window.global = window;
+    </script>
   </head>
   <body>
     <div id="root"></div>
