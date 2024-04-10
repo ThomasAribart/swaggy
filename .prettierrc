@@ -2,6 +2,9 @@
   "singleQuote": true,
   "trailingComma": "all",
   "arrowParens": "avoid",
-  "importOrder": ["^@apdupius(.*)/(.*)$", "^~/(.*)$", "^[./]"],
-  "importOrderSeparation": true
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": ["<THIRD_PARTY_MODULES>", "^~/(.*)$", "^[./]"],
+  "importOrderSortSpecifiers": true,
+  "importOrderSeparation": true,
+  "importOrderCaseInsensitive": true
 }
