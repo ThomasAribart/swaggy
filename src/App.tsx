@@ -12,29 +12,30 @@ import {
   JSONEditor as VanillaJSONEditor,
 } from 'vanilla-jsoneditor';
 
-const compress = async (str: string): Promise<void> => {
-  const strBinInput = new TextEncoder().encode(str);
+const compress = async (input: string): Promise<string> => {
+  const strBinInput = new TextEncoder().encode(input);
 
   const compressionStream = new CompressionStream('gzip');
   const compressionWriter = compressionStream.writable.getWriter();
   void compressionWriter.write(strBinInput);
   void compressionWriter.close();
 
-  const encodedBinInput = await new Response(
+  const compressedArrayBuffer = await new Response(
     compressionStream.readable,
   ).arrayBuffer();
 
-  const encodedStr = Array.prototype.map
-    .call(new Uint8Array(encodedBinInput), (byte: number) =>
+  const output = Array.prototype.map
+    .call(new Uint8Array(compressedArrayBuffer), (byte: number) =>
       ('00' + byte.toString(16)).slice(-2),
     )
     .join('');
 
-  console.log('encoded', encodedStr);
-  console.log('encoded.length', encodedStr.length);
+  return output;
+};
 
+const decompress = async (input: string): Promise<string> => {
   const encodedBinOutput = new Uint8Array(
-    [...(encodedStr.match(/.{1,2}/g) ?? [])].map(byte => parseInt(byte, 16)),
+    [...(input.match(/.{1,2}/g) ?? [])].map(byte => parseInt(byte, 16)),
   ).buffer;
 
   const decompressionStream = new DecompressionStream('gzip');
@@ -42,13 +43,13 @@ const compress = async (str: string): Promise<void> => {
   void decompressionWriter.write(encodedBinOutput);
   void decompressionWriter.close();
 
-  const strBinOutput = await new Response(
+  const decompressedArrayBuffer = await new Response(
     decompressionStream.readable,
   ).arrayBuffer();
 
-  const decoded = new TextDecoder().decode(strBinOutput);
+  const output = new TextDecoder().decode(decompressedArrayBuffer);
 
-  console.log('decoded', decoded);
+  return output;
 };
 
 export const arePropsEqual =
@@ -112,6 +113,24 @@ JSONEditor.displayName = 'JSONEditor';
 export const App = (): JSX.Element => {
   const jsonEditedInputRef = useRef<unknown>({});
   const [isContentValid, setIsContentValid] = useState(true);
+  const [, setState] = useState(false);
+
+  useEffect(() => {
+    let hash = window.location.hash;
+
+    if (hash.startsWith('#')) {
+      hash = hash.slice(1);
+    }
+
+    if (hash !== '') {
+      decompress(hash)
+        .then(decompressed => {
+          jsonEditedInputRef.current = JSON.parse(decompressed);
+          setState(val => !val);
+        })
+        .catch(console.error);
+    }
+  }, [setState]);
 
   return (
     <Stack gap={4}>
@@ -119,14 +138,18 @@ export const App = (): JSX.Element => {
         variant="contained"
         disabled={!isContentValid}
         onClick={() =>
-          void compress(JSON.stringify(jsonEditedInputRef.current))
+          void compress(JSON.stringify(jsonEditedInputRef.current)).then(
+            compressed => {
+              window.location.hash = compressed;
+            },
+          )
         }
       >
         Submit
       </Button>
       <JSONEditor
         mode={Mode.text}
-        content={{ json: {} }}
+        content={{ json: jsonEditedInputRef.current }}
         mainMenuBar={false}
         onChange={(nextContent, _prevContent, status) => {
           const nextIsContentValid = !hasError(status);
