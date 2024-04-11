@@ -43,7 +43,7 @@ const Editor = (): JSX.Element => {
             )
           }
         >
-          Get link
+          Save
         </Button>
       </Stack>
       <Stack direction="row">
