@@ -1,7 +1,8 @@
 *.hbs
-pnpm-lock.yaml
 .gitlab-ci.yml
-.pnpm
+yarn.lock
+.prettierignore
+.gitignore
 **/coverage
 **/dist
 **/build
