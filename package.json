@@ -3,13 +3,14 @@
   "description": "Share OpenAPI documentation effortlessly",
   "main": "index.js",
   "scripts": {
+    "build": "rm -rf dist && vite build",
     "serve": "vite preview",
     "start": "vite",
-    "test": "pnpm test-type && pnpm test-unit && pnpm test-circular && pnpm test-unused-exports && pnpm test-linter",
+    "test": "yarn test-type && yarn test-unit && yarn test-circular && yarn test-unused-exports && yarn test-linter",
     "test-type": "tsc --noEmit",
     "test-unit": "vitest run --passWithNoTests",
     "test-unit-watch": "vitest --passWithNoTests",
-    "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
+    "test-circular": "yarn depcruise --validate .dependency-cruiser.js .",
     "test-unused-exports": "./node_modules/.bin/ts-unused-exports ./tsconfig.json --excludeDeclarationFiles --silent --excludePathsFromReport='vite.config.ts;'",
     "test-linter": "eslint --ext=js,jsx,ts,tsx src"
   },
@@ -17,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/material": "^5.15.15",
     "@mui/styled-engine": "^5.15.14",
@@ -54,5 +56,9 @@
     "vite-plugin-html": "^3.2.2",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.4.0"
-  }
+  },
+  "maintainers": [
+    "Thomas Aribart"
+  ],
+  "packageManager": "yarn@3.2.1"
 }
