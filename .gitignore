@@ -1,6 +1,5 @@
 # package directories
 node_modules
-.pnpm
 
 # production
 /build
