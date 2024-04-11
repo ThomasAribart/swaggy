@@ -1,0 +1,33 @@
+name: Install Node Dependencies
+description: Install dependencies using yarn
+runs:
+  using: composite
+  steps:
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Sync yarn cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: Sync node_modules cache
+      id: sync-node-modules-cache
+      uses: actions/cache@v3
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-modules-${{ env.NODE_VERSION }}-${{ hashFiles('./yarn.lock') }}
+
+    - name: Install node_modules
+      run: if [ '${{ steps.sync-node-modules-cache.outputs.cache-hit }}' != 'true' ]; then yarn install --immutable; fi
+      shell: bash

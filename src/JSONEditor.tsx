@@ -9,7 +9,7 @@ import {
   JSONEditor as VanillaJSONEditor,
 } from 'vanilla-jsoneditor';
 
-export const arePropsEqual =
+const arePropsEqual =
   <Props extends Record<string, unknown>>(...propKeys: (keyof Props)[]) =>
   (prevProps: Props, nextProps: Props): boolean =>
     propKeys.every(key => isEqual(prevProps[key], nextProps[key]));
@@ -29,9 +29,7 @@ const hasValidationErrors = (
 export const hasError = ({ contentErrors }: OnChangeStatus): boolean =>
   hasParseError(contentErrors) || hasValidationErrors(contentErrors);
 
-export const MemoizedJSONEditor = (
-  props: JSONEditorPropsOptional,
-): JSX.Element => {
+const MemoizedJSONEditor = (props: JSONEditorPropsOptional): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<VanillaJSONEditor | null>(null);
 
