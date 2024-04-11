@@ -1,0 +1,33 @@
+name: 🎯 Test PR
+# cancel previous runs on the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  CI: true
+  NODE_VERSION: 18.17.0
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: 🎯 Test PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install node_modules
+        uses: ./.github/actions/install-node-modules
+
+      - name: Run tests
+        uses: ./.github/actions/lint-and-tests

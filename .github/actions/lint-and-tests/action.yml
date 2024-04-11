@@ -1,0 +1,16 @@
+name: Lint & Test
+description: Run linters and tests on library
+runs:
+  using: composite
+  steps:
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install node_modules
+      uses: ./.github/actions/install-node-modules
+
+    - name: Run tests
+      run: yarn test
+      shell: bash
