@@ -1,26 +1,47 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Button } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import { useEffect, useRef, useState } from 'react';
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
 
-const Editor = lazy(() => import('~/Editor'));
-const Viewer = lazy(() => import('~/Viewer'));
+import { decompress } from './compression';
+import Editor from './Editor';
 
-export const App = (): JSX.Element => (
-  <BrowserRouter>
-    <Suspense fallback={<></>}>
-      <Routes>
-        <Route path="/editor" element={<Editor />} />
-        <Route path="/viewer" element={<Viewer />} />
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to={`/editor${
-                window.location.hash !== '#' ? window.location.hash : ''
-              }`}
-            />
-          }
-        />
-      </Routes>
-    </Suspense>
-  </BrowserRouter>
-);
+export const App = (): JSX.Element => {
+  const swaggerRef = useRef<string | object | undefined>({});
+  const [, render] = useState(false);
+  const [mode, setMode] = useState('view');
+
+  useEffect(() => {
+    let hash = window.location.hash;
+
+    if (hash.startsWith('#')) {
+      hash = hash.slice(1);
+    }
+
+    if (hash !== '') {
+      decompress(hash)
+        .then(decompressed => {
+          swaggerRef.current = JSON.parse(decompressed) as object;
+          render(val => !val);
+        })
+        .catch(console.error);
+    }
+  }, [render]);
+
+  return (
+    <Stack>
+      {mode === 'view' && (
+        <Stack>
+          <Stack direction="row">
+            <Button variant="contained" onClick={() => setMode('edit')}>
+              Edit
+            </Button>
+          </Stack>
+          <SwaggerUI spec={swaggerRef.current} />
+        </Stack>
+      )}
+      {mode === 'edit' && <Editor setMode={setMode} swaggerRef={swaggerRef} />}
+    </Stack>
+  );
+};
