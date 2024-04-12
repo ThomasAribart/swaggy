@@ -1,33 +1,25 @@
 import { Button, Stack } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+  Dispatch,
+  MutableRefObject,
+  SetStateAction,
+  useRef,
+  useState,
+} from 'react';
 import { isTextContent, Mode } from 'vanilla-jsoneditor';
 
-import { compress, decompress } from './compression';
+import { compress } from './compression';
 import { hasError, JSONEditor } from './JSONEditor';
 
-const Editor = (): JSX.Element => {
-  const jsonEditedInputRef = useRef<unknown>({});
+const Editor = ({
+  setMode,
+  swaggerRef,
+}: {
+  setMode: Dispatch<SetStateAction<string>>;
+  swaggerRef: MutableRefObject<string | object | undefined>;
+}): JSX.Element => {
+  const jsonEditedInputRef = useRef<unknown>(swaggerRef.current);
   const [isContentValid, setIsContentValid] = useState(true);
-  const [, render] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    let hash = window.location.hash;
-
-    if (hash.startsWith('#')) {
-      hash = hash.slice(1);
-    }
-
-    if (hash !== '') {
-      decompress(hash)
-        .then(decompressed => {
-          jsonEditedInputRef.current = JSON.parse(decompressed);
-          render(val => !val);
-        })
-        .catch(console.error);
-    }
-  }, [render]);
 
   return (
     <Stack gap={4}>
@@ -38,26 +30,14 @@ const Editor = (): JSX.Element => {
           onClick={() =>
             void compress(JSON.stringify(jsonEditedInputRef.current)).then(
               compressed => {
+                swaggerRef.current = jsonEditedInputRef.current as object;
                 window.location.hash = compressed;
+                setMode('view');
               },
             )
           }
         >
           Save
-        </Button>
-      </Stack>
-      <Stack direction="row">
-        <Button
-          variant="contained"
-          onClick={() =>
-            navigate(
-              `/viewer${
-                window.location.hash !== '#' ? window.location.hash : ''
-              }`,
-            )
-          }
-        >
-          View
         </Button>
       </Stack>
       <JSONEditor
