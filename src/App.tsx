@@ -12,6 +12,9 @@ export const App = (): JSX.Element => {
   const [, render] = useState(false);
   const [mode, setMode] = useState('view');
 
+  const readonly =
+    new URLSearchParams(window.location.search).get('readonly') === 'true';
+
   useEffect(() => {
     let hash = window.location.hash;
 
@@ -33,11 +36,13 @@ export const App = (): JSX.Element => {
     <Stack>
       {mode === 'view' && (
         <Stack>
-          <Stack direction="row">
-            <Button variant="contained" onClick={() => setMode('edit')}>
-              Edit
-            </Button>
-          </Stack>
+          {!readonly && (
+            <Stack direction="row">
+              <Button variant="contained" onClick={() => setMode('edit')}>
+                Edit
+              </Button>
+            </Stack>
+          )}
           <SwaggerUI spec={swaggerRef.current} />
         </Stack>
       )}
